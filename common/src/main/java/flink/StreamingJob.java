@@ -18,8 +18,10 @@
 
 package flink;
 
+import flink.sink.MessageSerialize;
 import flink.source.OpenCVSocketSource;
 import flink.process.TransformToLocation;
+import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -44,6 +46,7 @@ public class StreamingJob {
         DataStream<Tuple2<Long, byte[]>> testStream = env.addSource(new OpenCVSocketSource(8002));
 //        DataStream<byte[]> showImage = testStream.flatMap(new ShowImage());
         DataStream<String> transformToLocation = testStream.flatMap(new TransformToLocation());
+        transformToLocation.writeToSocket("localhost", 8003, new MessageSerialize());
 
         // showImage.writeAsText("./socketTest.txt");
         /*
