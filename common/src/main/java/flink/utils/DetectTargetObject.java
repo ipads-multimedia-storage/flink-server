@@ -1,6 +1,7 @@
-package flink.detection;
+package flink.utils;
 
-import flink.utils.Message;
+import flink.types.Information;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.bytedeco.javacv.CanvasFrame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.CvScalar;
@@ -30,8 +31,7 @@ public class DetectTargetObject {
         path.setContentPane(jp);
     }
 
-
-    public static Message detectTargetObject(IplImage img) {
+    public static Tuple2<Boolean, Information> detectTargetObject(IplImage img) {
         int posX = 0;
         int posY = 0;
 
@@ -50,11 +50,11 @@ public class DetectTargetObject {
             posY = (int) (mom01 / area);
             // only if its a valid position
             if (posX > 0 && posY > 0) {
-                paint(img, posX, posY);
-                return new Message(true, (long) 1, posX, posY);
+//                paint(img, posX, posY);
+                return Tuple2.of(true, new Information(1L, 0L, posX, posY));
             }
         }
-        return new Message(false, (long) -1, posX, posY);
+        return Tuple2.of(false, new Information(0L, 0L, posX, posY));
     }
 
     private static void paint(IplImage img, int posX, int posY) {

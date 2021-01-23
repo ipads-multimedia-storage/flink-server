@@ -18,10 +18,11 @@
 
 package flink;
 
+import flink.operator.CorrectWindowFunction;
+import flink.operator.ObjectIdSelector;
 import flink.sink.MessageSerialize;
 import flink.source.OpenCVSocketSource;
-import flink.process.TransformToLocation;
-import org.apache.flink.api.common.serialization.SerializationSchema;
+import flink.operator.TransformMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -39,35 +40,16 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * method, change the respective entry in the POM.xml file (simply search for 'mainClass').
  */
 public class StreamingJob {
-
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStream<Tuple2<Long, byte[]>> testStream = env.addSource(new OpenCVSocketSource(8002));
-//        DataStream<byte[]> showImage = testStream.flatMap(new ShowImage());
-        DataStream<String> transformToLocation = testStream.flatMap(new TransformToLocation());
-        transformToLocation.writeToSocket("localhost", 8003, new MessageSerialize());
-
-        // showImage.writeAsText("./socketTest.txt");
-        /*
-         * Here, you can start creating your execution plan for Flink.
-         *
-         * Start with getting some data from the environment, like
-         * 	env.readTextFile(textPath);
-         *
-         * then, transform the resulting DataStream<String> using operations
-         * like
-         * 	.filter()
-         * 	.flatMap()
-         * 	.join()
-         * 	.coGroup()
-         *
-         * and many more.
-         * Have a look at the programming guide for the Java API:
-         *
-         * http://flink.apache.org/docs/latest/apis/streaming/index.html
-         *
-         */
+        // showImage = testStream.flatMap(new ShowImage());
+        testStream.flatMap(new TransformMapFunction())
+                .keyBy(new ObjectIdSelector())
+                .countWindow(5, 2)
+                .apply(new CorrectWindowFunction())
+                .writeToSocket("192.168.11.138", 8003, new MessageSerialize());
 
         // execute program
         env.execute("Flink Streaming Java API Skeleton");
