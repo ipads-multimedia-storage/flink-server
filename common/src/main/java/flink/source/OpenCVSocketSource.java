@@ -1,5 +1,6 @@
 package flink.source;
 
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.IOUtils;
 import org.apache.flink.util.Preconditions;
@@ -9,7 +10,7 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class OpenCVSocketSource implements SourceFunction<byte[]> {
+public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> {
     private volatile boolean isRunning;
     private transient Socket currentSocket;
     private transient ServerSocket serverSocket;
@@ -22,7 +23,7 @@ public class OpenCVSocketSource implements SourceFunction<byte[]> {
     }
 
     @Override
-    public void run(SourceContext<byte[]> sourceContext) throws Exception {
+    public void run(SourceContext<Tuple2<Long, byte[]>> sourceContext) throws Exception {
         this.serverSocket = new ServerSocket(this.port);
         while(this.isRunning) {
             Socket socket = null;
@@ -35,10 +36,14 @@ public class OpenCVSocketSource implements SourceFunction<byte[]> {
                 Throwable throwable1 = null;
 
                 try {
+                    byte[] timeBuf = new byte[16];
                     byte[] lenBuf = new byte[16];
                     byte[] byteBuf = new byte[8192];
                     int bytesRead;
-                    while (this.isRunning && reader.read(lenBuf, 0, 16) != -1) {
+                    while (this.isRunning && reader.read(timeBuf, 0, 16) != -1) {
+                        String timeStr = new String(timeBuf);
+                        long timeStamp = Long.parseLong(timeStr.trim());
+                        if(reader.read(lenBuf, 0, 16) == -1) break;
                         String lengthStr = new String(lenBuf);
                         int length = Integer.parseInt(lengthStr.trim());
                         int left = length; boolean eof = false; int pos = 0;
@@ -54,7 +59,7 @@ public class OpenCVSocketSource implements SourceFunction<byte[]> {
                             left -= bytesRead;
                             pos += bytesRead;
                         }
-                        sourceContext.collect(byteBuf);
+                        sourceContext.collect(new Tuple2<>(timeStamp, byteBuf));
                         if(eof) break;
                     }
                 } catch (Throwable throwable2) {
