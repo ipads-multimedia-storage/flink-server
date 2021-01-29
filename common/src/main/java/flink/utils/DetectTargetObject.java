@@ -28,10 +28,12 @@ public class DetectTargetObject {
     static OpenCVFrameConverter.ToIplImage converter = new OpenCVFrameConverter.ToIplImage();
 
     public DetectTargetObject(){
+        canvas.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        path.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         path.setContentPane(jp);
     }
 
-    public static Tuple2<Boolean, Information> detectTargetObject(IplImage img) {
+    public Tuple2<Boolean, Information> detectTargetObject(IplImage img) {
         int posX = 0;
         int posY = 0;
 
@@ -50,22 +52,20 @@ public class DetectTargetObject {
             posY = (int) (mom01 / area);
             // only if its a valid position
             if (posX > 0 && posY > 0) {
-//                paint(img, posX, posY);
-                return Tuple2.of(true, new Information(1L, 0L, posX, posY));
+                paint(img, posX, posY);
+                return Tuple2.of(true, new Information());
             }
         }
-        return Tuple2.of(false, new Information(0L, 0L, posX, posY));
+        return Tuple2.of(false, new Information());
     }
 
     private static void paint(IplImage img, int posX, int posY) {
         Graphics g = jp.getGraphics();
         path.setSize(img.width(), img.height());
-        if (g != null) {
-            // g.clearRect(0, 0, img.width(), img.height());
-            g.setColor(Color.RED);
-            // g.fillOval(posX, posY, 20, 20);
-            g.drawOval(posX, posY, 20, 20);
-        }
+        // g.clearRect(0, 0, img.width(), img.height());
+        g.setColor(Color.RED);
+        // g.fillOval(posX, posY, 20, 20);
+        g.drawOval(posX, posY, 20, 20);
     }
 
     private static IplImage getThresholdImage(IplImage orgImg) {
