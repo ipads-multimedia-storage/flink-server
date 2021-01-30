@@ -1,14 +1,17 @@
 package flink.source;
 
+import flink.utils.BandwidthDetection;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.IOUtils;
 import org.apache.flink.util.Preconditions;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> {
     private volatile boolean isRunning;
@@ -36,20 +39,30 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
                 Throwable throwable1 = null;
 
                 try {
-                    byte[] timeBuf = new byte[16];
                     byte[] lenBuf = new byte[16];
-                    byte[] byteBuf = new byte[8192];
+                    byte[] byteBuf, jsonBuf;
                     int bytesRead;
-                    while (this.isRunning && reader.read(timeBuf, 0, 16) != -1) {
-                        String timeStr = new String(timeBuf);
-                        long timeStamp = Long.parseLong(timeStr.trim());
-                        if(reader.read(lenBuf, 0, 16) == -1) break;
+                    while (this.isRunning && reader.read(lenBuf, 0, 16) != -1) {
                         String lengthStr = new String(lenBuf);
                         int length = Integer.parseInt(lengthStr.trim());
                         int left = length; boolean eof = false; int pos = 0;
-                        while(length > byteBuf.length) {
-                            byteBuf = new byte[byteBuf.length * 2];
+                        jsonBuf = new byte[length];
+                        while(left > 0) {
+                            bytesRead = reader.read(jsonBuf, pos, left);
+                            if (bytesRead == -1) {
+                                eof = true;
+                                break;
+                            }
+                            left -= bytesRead;
+                            pos += bytesRead;
                         }
+                        if(eof) break;
+                        JSONObject jsonObject = new JSONObject(new String(jsonBuf, StandardCharsets.UTF_8));
+                        length = jsonObject.getInt("length");
+                        long eventTime = jsonObject.getLong("event_time");
+                        long beforeTime = jsonObject.getLong("current_time");
+                        left = length; eof = false; pos = 0;
+                        byteBuf = new byte[length];
                         while(left > 0) {
                             bytesRead = reader.read(byteBuf, pos, left);
                             if (bytesRead == -1) {
@@ -59,8 +72,12 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
                             left -= bytesRead;
                             pos += bytesRead;
                         }
-                        sourceContext.collect(new Tuple2<>(timeStamp, byteBuf));
                         if(eof) break;
+                        long afterTime = System.currentTimeMillis();
+                        long gap = afterTime - beforeTime;
+                        System.out.println("gap is: " + gap);
+                        BandwidthDetection.record(gap, length);
+                        sourceContext.collect(new Tuple2<>(eventTime, byteBuf));
                     }
                 } catch (Throwable throwable2) {
                     throwable1 = throwable2;
@@ -110,4 +127,5 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
             } catch (IOException ignored) {}
         }
     }
+
 }

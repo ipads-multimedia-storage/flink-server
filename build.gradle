@@ -86,6 +86,7 @@ subprojects {
         implementation "log4j:log4j:${log4jVersion}"
         implementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
         implementation group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.4'
+        compile group: 'org.json', name: 'json', version: '20201115'
 
         if (project != project(":common")) {
             implementation project(path: ':common')
