@@ -1,16 +1,33 @@
 package flink.types;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.opencv.core.Point;
 
 public class Information {
     Long objectID;
     Long eventTime;
-    Tuple2<Integer, Integer> location;
 
-    public Information(Long objectID, Long eventTime, Integer posX, Integer posY) {
+    public Double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(Double angle) {
+        this.angle = angle;
+    }
+
+    Double angle;
+    Tuple2<Double, Double> location;
+
+    public Information(Long objectID, Long eventTime, Double posX, Double posY, Double angle) {
         this.objectID = objectID;
         this.eventTime = eventTime;
         this.location = Tuple2.of(posX, posY);
+        this.angle = angle;
+    }
+
+    public Information(Long objectID, Long eventTime) {
+        this.objectID = objectID;
+        this.eventTime = eventTime;
     }
 
     public Information() {
@@ -29,23 +46,27 @@ public class Information {
         this.eventTime = eventTime;
     }
 
-    public Tuple2<Integer, Integer> getLocation() {
+    public Tuple2<Double, Double> getLocation() {
         return location;
     }
 
-    public void setLocation(Tuple2<Integer, Integer> location) {
+    public void setLocation(Tuple2<Double, Double> location) {
         this.location = location;
+    }
+
+    public void setLocation(Point center) {
+        this.location = Tuple2.of(center.x, center.y);
     }
 
     public void showMessage() {
         System.out.println("id:" + objectID + ",  time:" + eventTime + ", (" + location.f0 + ", " + location.f1 + ")");
     }
 
-    public Integer getPosX() {
+    public Double getPosX() {
         return location.f0;
     }
 
-    public Integer getPosY() {
+    public Double getPosY() {
         return location.f1;
     }
 
