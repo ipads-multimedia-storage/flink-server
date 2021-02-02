@@ -16,9 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Information> {
-    Double speed;
     DetectTargetObject obj = new DetectTargetObject();
-    CentroidTracker tracker = new CentroidTracker(10, 50);
+    CentroidTracker tracker = new CentroidTracker(20, 100);
 
     public HashMap<Long, RotatedRect> detect(Mat image, Long eventTime) throws Exception {
         if (image == null) {
@@ -26,6 +25,7 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
             return null;
         }
         List<RotatedRect> rects = obj.detectTargetObject(image);
+        System.out.println("rects:" + rects.size());
         return tracker.update(rects, eventTime);
     }
 
@@ -40,6 +40,7 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
             Information output = new Information(item.getKey(), eventTime);
             output.setLocation(center);
             output.setAngle(angle);
+            output.showMessage();
             collector.collect(output);
         }
     }

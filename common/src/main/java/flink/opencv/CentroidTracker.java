@@ -83,7 +83,7 @@ public class CentroidTracker implements Serializable {
                 if(distance.get(minIndex) > threshold){
                     deregister(ID);
                 } else {
-                    objects.replace(eventTime, inputCentroids.get(minIndex));
+                    objects.replace(ID, inputCentroids.get(minIndex));
                     unusedinputCtds.remove(minIndex);
                 }
             }

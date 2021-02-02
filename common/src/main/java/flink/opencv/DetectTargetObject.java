@@ -7,17 +7,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.opencv.highgui.HighGui.imshow;
-import static org.opencv.highgui.HighGui.waitKey;
-
+import static org.opencv.highgui.HighGui.*;
 
 public class DetectTargetObject implements Serializable {
     /**
      * Correct the color range- it depends upon the object, camera quality,
      * environment.
      */
-    static Scalar rgba_min = new Scalar(0, 200, 0);
-    static Scalar rgba_max = new Scalar(19, 255, 255);
+    static Scalar rgba_min = new Scalar(156, 43, 46);
+    static Scalar rgba_max = new Scalar(180, 255, 255);
+
+    public DetectTargetObject(){
+        namedWindow("window");
+    }
 
     public List<RotatedRect> detectTargetObject(Mat img) throws Exception{
         List<MatOfPoint> contours = new ArrayList<>();
@@ -36,11 +38,11 @@ public class DetectTargetObject implements Serializable {
                 RotatedRect boundingRect = Imgproc.minAreaRect(areaPoints);
 
                 // test min ROI area in pixels
-                if (boundingRect.size.area() > 3000) {
+                if (boundingRect.size.area() > 5000) {
                     boundingRects.add(boundingRect);
                 }
             }
-            // drawContours(boundingRects, img);
+            drawContours(boundingRects, img);
         }
         return boundingRects;
     }
@@ -51,9 +53,9 @@ public class DetectTargetObject implements Serializable {
             boundingRect.points(vertices);
             List<MatOfPoint> boxContours = new ArrayList<>();
             boxContours.add(new MatOfPoint(vertices));
-            Imgproc.drawContours(img, boxContours, 0, new Scalar(128, 128, 128), 2);
+            Imgproc.drawContours(img, boxContours, 0, new Scalar(255, 0, 0), 2);
         }
-        imshow("boundingRect", img);
-        waitKey(0);
+        imshow("window", img);
+        waitKey(5);
     }
 }

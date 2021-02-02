@@ -55,15 +55,17 @@ public class StreamingJob {
         // show the raw image video by this
         // source.flatMap(new ShowImage());
 
+        env.setParallelism(1);
+
         // process the data
         DataStream<Output> output = source
                 .flatMap(new TransferImage())
                 .keyBy(new ObjectIdSelector())
-                .countWindow(5, 2)
+                .countWindow(10, 5)
                 .aggregate(new LocationAggregate());
 
         // sink data to arm
-        output.writeToSocket("192.168.11.138", 8003, new MessageSerialize());
+        output.writeToSocket("localhost", 8003, new MessageSerialize());
 
         // execute program
         env.execute("Flink Streaming Java API Skeleton");
