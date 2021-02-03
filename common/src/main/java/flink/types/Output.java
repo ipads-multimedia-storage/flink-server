@@ -1,5 +1,7 @@
 package flink.types;
 
+import org.json.JSONObject;
+
 public class Output {
     Information info;
     Double speed;
@@ -23,11 +25,16 @@ public class Output {
         this.speed = speed;
     }
 
-    public String serialize() {
-        return String.valueOf(info.eventTime) +
-                info.objectID +
-                info.location.f0 +
-                info.location.f1 +
-                speed;
+    public JSONObject serialize() {
+        if (info == null){
+            return null;
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", info.getObjectID());
+        jsonObject.put("time", info.getEventTime());
+        jsonObject.put("x", info.getPosX());
+        jsonObject.put("y", info.getPosY());
+        jsonObject.put("angle", info.getAngle());
+        return jsonObject;
     }
 }

@@ -5,6 +5,9 @@ import flink.utils.BandwidthDetection;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MessageSerialize implements SerializationSchema<Output> {
     @Override
     public byte[] serialize(Output element) {
@@ -13,7 +16,14 @@ public class MessageSerialize implements SerializationSchema<Output> {
         if(avgBand > 0) {
             jsonObject.put("bandwidth", avgBand);
         }
-        jsonObject.put("message", element.serialize());
+        jsonObject.put("speed", element.getSpeed());
+
+        List<JSONObject> sList = new ArrayList<>();
+        if (element.serialize() != null){
+            sList.add(element.serialize());
+        }
+        jsonObject.put("objects", sList);
+
         String jsonString = jsonObject.toString();
         return String.format("%-16d%s", jsonString.length(), jsonString).getBytes();
     }

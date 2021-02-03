@@ -17,7 +17,7 @@ public class LocationAggregate implements AggregateFunction<Information, Accumul
     @Override
     // 当一个新元素流入时，将新元素与状态数据ACC合并，返回状态数据ACC
     public Accumulator add(Information value, Accumulator accumulator) {
-        if(accumulator.count == 0){
+        if (accumulator.count == 0) {
             accumulator.start = value;
         } else {
             accumulator.end = value;
@@ -29,7 +29,10 @@ public class LocationAggregate implements AggregateFunction<Information, Accumul
     @Override
     // 将中间数据转成结果数据
     public Output getResult(Accumulator accumulator) {
-        Double speed = (accumulator.end.getPosX() - accumulator.start.getPosX())/(accumulator.end.getEventTime() - accumulator.start.getEventTime());
+        Double speed = 0.0;
+        if (accumulator.end != null) {
+            speed = (accumulator.end.getPosX() - accumulator.start.getPosX()) / (accumulator.end.getEventTime() - accumulator.start.getEventTime());
+        }
         Output output = new Output();
         output.setInfo(accumulator.end);
         output.setSpeed(speed);
