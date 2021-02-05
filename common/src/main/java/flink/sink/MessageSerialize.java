@@ -17,6 +17,7 @@ public class MessageSerialize implements SerializationSchema<Output> {
             jsonObject.put("bandwidth", avgBand);
         }
         jsonObject.put("speed", element.getSpeed());
+        jsonObject.put("sendTime", System.currentTimeMillis());
 
         List<JSONObject> sList = new ArrayList<>();
         if (element.serialize() != null){
