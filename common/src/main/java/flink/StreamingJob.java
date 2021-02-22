@@ -18,8 +18,10 @@
 
 package flink;
 
+import flink.operator.BandwidthAggregate;
 import flink.operator.LocationAggregate;
 import flink.operator.ObjectIdSelector;
+import flink.sink.BandwidthSerialize;
 import flink.sink.MessageSerialize;
 import flink.sink.PravegaRouter;
 import flink.sink.PravegaSerialize;
@@ -39,6 +41,8 @@ import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
 import org.apache.flink.connector.jdbc.JdbcSink;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.time.Time;
 
 import java.net.URI;
 import java.time.Duration;
@@ -96,6 +100,10 @@ public class StreamingJob {
 
         // you can view the raw image video by this(for test only)
         // source.flatMap(new ShowImage());
+
+        source.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
+                .aggregate(new BandwidthAggregate())
+                .writeToSocket(params.get("socket.sink.hostname"), params.getInt("socket.bandwidth.port"), new BandwidthSerialize());
 
         // process the data
         DataStream<Output> output = source
