@@ -87,6 +87,9 @@ subprojects {
         implementation "org.slf4j:slf4j-log4j12:${slf4jVersion}"
         implementation group: 'org.bytedeco', name: 'javacv-platform', version: '1.5.4'
         compile group: 'org.json', name: 'json', version: '20201115'
+        // https://mvnrepository.com/artifact/org.apache.flink/flink-runtime-web
+        testCompile group: 'org.apache.flink', name: 'flink-runtime-web_2.11', version: '1.12.0'
+
 
         if (project != project(":common")) {
             implementation project(path: ':common')

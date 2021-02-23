@@ -42,7 +42,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  */
 public class StreamingJob {
     // load opencv dll file
-    static { System.load("C:\\Windows\\System32\\opencv.dll"); };
+    static { System.load("C:\\Windows\\System32\\opencv.dll"); }
 
     public static void main(String[] args) throws Exception {
         // set up the streaming execution environment
@@ -59,12 +59,14 @@ public class StreamingJob {
 
         // process the data
         DataStream<Output> output = source
-                .flatMap(new TransferImage())
-                .keyBy(new ObjectIdSelector())
-                .countWindow(10, 5)
-                .aggregate(new LocationAggregate());
+                .flatMap(new TransferImage());
+//                .keyBy(value -> value. )
+//                .keyBy(new ObjectIdSelector())
+//                .countWindow(20)
+//                .aggregate(new LocationAggregate());
 
         // sink data to arm
+//        output.writeToSocket("192.168.137.221", 8003, new MessageSerialize());
         output.writeToSocket("localhost", 8003, new MessageSerialize());
 
         // execute program

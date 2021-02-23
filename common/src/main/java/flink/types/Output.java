@@ -3,14 +3,10 @@ package flink.types;
 import org.json.JSONObject;
 
 public class Output {
-    Information info;
+    public Information info;
     Double speed;
 
     public Output() {
-    }
-
-    public Information getInfo() {
-        return info;
     }
 
     public void setInfo(Information info) {
@@ -32,6 +28,7 @@ public class Output {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", info.getObjectID());
         jsonObject.put("time", info.getEventTime());
+        jsonObject.put("speed", getSpeed());
         jsonObject.put("x", info.getPosX());
         jsonObject.put("y", info.getPosY());
         jsonObject.put("angle", info.getAngle());

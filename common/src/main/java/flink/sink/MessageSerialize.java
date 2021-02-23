@@ -16,13 +16,9 @@ public class MessageSerialize implements SerializationSchema<Output> {
         if(avgBand > 0) {
             jsonObject.put("bandwidth", avgBand);
         }
-        jsonObject.put("speed", element.getSpeed());
+        jsonObject.put("object", element.serialize());
 
-        List<JSONObject> sList = new ArrayList<>();
-        if (element.serialize() != null){
-            sList.add(element.serialize());
-        }
-        jsonObject.put("objects", sList);
+        System.out.println(String.format(element.info.getObjectID().toString()));
 
         String jsonString = jsonObject.toString();
         return String.format("%-16d%s", jsonString.length(), jsonString).getBytes();

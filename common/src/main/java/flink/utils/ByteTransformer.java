@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ByteTransformer {
     private static OpenCVFrameConverter.ToMat matConverter = new OpenCVFrameConverter.ToMat();
@@ -28,5 +29,20 @@ public class ByteTransformer {
         } catch (IOException e) {
             throw new RuntimeException("bufferedImage failure: "+ e.getMessage(), e);
         }
+    }
+
+    public static BufferedImage Mat2bufferedImage(Mat image) {
+        MatOfByte bytemat = new MatOfByte();
+        Imgcodecs.imencode(".jpg", image, bytemat);
+        byte[] bytes = bytemat.toArray();
+        InputStream in = new ByteArrayInputStream(bytes);
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(in);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return img;
     }
 }

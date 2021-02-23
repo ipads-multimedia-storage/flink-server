@@ -31,7 +31,7 @@ public class LocationAggregate implements AggregateFunction<Information, Accumul
     public Output getResult(Accumulator accumulator) {
         Double speed = 0.0;
         if (accumulator.end != null) {
-            speed = (accumulator.end.getPosX() - accumulator.start.getPosX()) / (accumulator.end.getEventTime() - accumulator.start.getEventTime());
+            speed = (accumulator.end.getPosY() - accumulator.start.getPosY()) / (accumulator.end.getEventTime() - accumulator.start.getEventTime());
         }
         Output output = new Output();
         output.setInfo(accumulator.end);

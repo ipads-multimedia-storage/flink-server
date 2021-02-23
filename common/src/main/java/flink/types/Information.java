@@ -59,7 +59,7 @@ public class Information {
     }
 
     public void showMessage() {
-        System.out.println("id:" + objectID + ",  time:" + eventTime + ", angle:" + angle + ", location: (" + location.f0 + ", " + location.f1 + ")");
+//        System.out.println("id:" + objectID + ",  time:" + eventTime + ", angle:" + angle + ", location: (" + location.f0 + ", " + location.f1 + ")");
     }
 
     public Double getPosX() {

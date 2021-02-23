@@ -1,7 +1,10 @@
 package flink.opencv;
 
+import flink.operator.TransferImage;
 import org.opencv.core.Point;
 import org.opencv.core.RotatedRect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
 import java.io.Serializable;
@@ -18,6 +21,8 @@ public class CentroidTracker implements Serializable {
     ConcurrentHashMap<Long, RotatedRect> objects = new ConcurrentHashMap<>();
     ConcurrentHashMap<Long, Integer> disappeared = new ConcurrentHashMap<>();
 
+    Logger LOG = LoggerFactory.getLogger("CentroidTracker");
+
     public CentroidTracker(Integer maxDisappeared, Integer threshold) {
         this.threshold = threshold;
         this.maxDisappeared = maxDisappeared;
@@ -25,12 +30,14 @@ public class CentroidTracker implements Serializable {
 
     public void register(Long objectID, RotatedRect centroid) {
         // 注册对象时，我们使用下一个可用的对象ID来存储质心
+        LOG.info("register object {}", objectID.toString());
         objects.put(objectID, centroid);
         disappeared.put(objectID, 0);
     }
 
     public void deregister(Long objectID){
         // 要注销注册对象ID，我们从两个字典中都删除了该对象ID
+        LOG.info("deregister object {}", objectID.toString());
         objects.remove(objectID);
         disappeared.remove(objectID);
     }
@@ -71,6 +78,9 @@ public class CentroidTracker implements Serializable {
                         .boxed()
                         .min(comparingDouble(distance::get))
                         .get();  // or throw if empty list
+
+                LOG.info("ID {} min distance is {}", ID, distance.get(minIndex).toString());
+
                 if (distance.get(minIndex) > threshold) {
                     deregister(ID);
                 } else {
@@ -80,7 +90,7 @@ public class CentroidTracker implements Serializable {
             }
             // 注册新输入的没有对应的
             for (Integer index = 0; index < list.size(); index += 1){
-                if(usedInputCtds.contains(index))
+                if(!usedInputCtds.contains(index))
                     register(eventTime, list.get(index));
             }
         }
