@@ -1,5 +1,6 @@
 package flink.tracker;
 
+import flink.config.CONFIG;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Size;

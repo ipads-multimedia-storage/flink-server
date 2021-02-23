@@ -1,4 +1,4 @@
-package flink.tracker;
+package flink.config;
 
 import org.opencv.core.Scalar;
 
@@ -32,5 +32,6 @@ public class CONFIG {
     public static int _max_trace_length = 50;
 
     public static int _skip_frames = 100;
+    public static int _output_interval = 1000;
 }
 

@@ -1,10 +1,9 @@
 package flink.operator;
 
-import flink.tracker.CONFIG;
+import flink.config.CONFIG;
 import flink.tracker.Track;
 import flink.tracker.Tracker;
 import flink.types.Information;
-import flink.types.Output;
 import flink.utils.ByteTransformer;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -23,7 +22,7 @@ import static flink.tracker.DetectContours.detectionContours;
 import static flink.tracker.ProcessFrame.processFrame;
 import static flink.utils.ByteTransformer.Mat2bufferedImage;
 
-public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Output> {
+public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Information> {
     static int i;
     static Mat imag, orgin, kalman, diffFrame, outbox;
     static Vector<Rect> array;
@@ -179,7 +178,7 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Outp
     }
 
     @Override
-    public void flatMap(Tuple2<Long, byte[]> in, Collector<Output> collector) throws Exception {
+    public void flatMap(Tuple2<Long, byte[]> in, Collector<Information> collector) throws Exception {
         byte[] bytes = in.f1;
         Long eventTime = in.f0;
 
@@ -193,21 +192,17 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Outp
         for (int k = 0; k < tracker.tracks.size(); k++) {
             Track track = tracker.tracks.get(k);
             int traceNum = track.trace.size();
-            if (traceNum > 20 && !noticeObj.contains(track.track_id)) {
-                noticeObj.add(track.track_id);
+            if (i > CONFIG._skip_frames){
+                Double angle = 90.;
+                Information inf = new Information(track.track_id, eventTime);
+                inf.setLocation(track.prediction);
+                inf.setAngle(angle);
 
-                if (i > CONFIG._skip_frames){
-                    Double angle = 90.;
-                    Information inf = new Information(track.track_id, eventTime);
-                    inf.setLocation(track.trace.get(traceNum - 1));
-                    inf.setAngle(angle);
+//                Output output = new Output();
+//                output.setInfo(inf);
+//                output.setSpeed((track.trace.get(0).y - track.trace.get(traceNum - 1).y)/(eventTime - track.track_id));
 
-                    Output output = new Output();
-                    output.setInfo(inf);
-                    output.setSpeed((track.trace.get(0).y - track.trace.get(traceNum - 1).y)/(eventTime - track.track_id));
-
-                    collector.collect(output);
-                }
+                collector.collect(inf);
             }
         }
     }

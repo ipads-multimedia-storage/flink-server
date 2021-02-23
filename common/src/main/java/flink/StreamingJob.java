@@ -18,11 +18,11 @@
 
 package flink;
 
-import flink.operator.LocationAggregate;
-import flink.operator.ObjectIdSelector;
+import flink.operator.InformationToOutput;
 import flink.sink.MessageSerialize;
 import flink.source.OpenCVSocketSource;
 import flink.operator.TransferImage;
+import flink.types.Information;
 import flink.types.Output;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -59,14 +59,12 @@ public class StreamingJob {
 
         // process the data
         DataStream<Output> output = source
-                .flatMap(new TransferImage());
-//                .keyBy(value -> value. )
-//                .keyBy(new ObjectIdSelector())
-//                .countWindow(20)
-//                .aggregate(new LocationAggregate());
+                .flatMap(new TransferImage())
+                .keyBy(Information::getObjectID)
+                .flatMap(new InformationToOutput());
 
         // sink data to arm
-//        output.writeToSocket("192.168.137.221", 8003, new MessageSerialize());
+//        output.writeToSocket("192.168.11.136", 8003, new MessageSerialize());
         output.writeToSocket("localhost", 8003, new MessageSerialize());
 
         // execute program
