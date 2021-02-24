@@ -12,10 +12,11 @@ public class MessageSerialize implements SerializationSchema<Output> {
     @Override
     public byte[] serialize(Output element) {
         JSONObject jsonObject = new JSONObject();
-      
+        double avgBand = BandwidthDetection.getAvg();
+        if(avgBand > 0) {
+            jsonObject.put("bandwidth", avgBand);
+        }
         jsonObject.put("object", element.serialize());
-        jsonObject.put("speed", element.getSpeed());
-        jsonObject.put("sendTime", System.currentTimeMillis());
 
         System.out.println(String.format(element.info.getObjectID().toString()));
 

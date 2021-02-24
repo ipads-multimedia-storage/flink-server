@@ -18,10 +18,6 @@ public class DetectContours {
         Mat vv = outmat.clone();
         List<MatOfPoint> contours = new ArrayList<>();
 
-        Imgproc.cvtColor(vv, vv, Imgproc.COLOR_RGBA2RGB, 0);
-        Imgproc.cvtColor(vv, vv, Imgproc.COLOR_RGB2Lab, 0);
-        Core.inRange(vv, rgba_min, rgba_max, vv);
-
         Imgproc.findContours(vv, contours, v, Imgproc.RETR_LIST,
                 Imgproc.CHAIN_APPROX_SIMPLE);
 

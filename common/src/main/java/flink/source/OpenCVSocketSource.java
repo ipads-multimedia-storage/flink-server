@@ -75,7 +75,7 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
                         if(eof) break;
                         long afterTime = System.currentTimeMillis();
                         long gap = afterTime - beforeTime;
-//                        System.out.println("gap is: " + gap);
+                        System.out.println("gap is: " + gap);
                         BandwidthDetection.record(gap, length);
                         sourceContext.collect(new Tuple2<>(eventTime, byteBuf));
                     }

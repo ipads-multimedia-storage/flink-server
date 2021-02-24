@@ -10,12 +10,9 @@ import java.util.Vector;
 
 /**
  * Tracker.java TODO:
- *
- * @author Kim Dinh Son Email:sonkdbk@gmail.com
  */
 
 public class Tracker extends JTracker {
-//    int nextTractID = 0;
     Vector<Integer> assignment = new Vector<>();
 
     public Tracker(float _dt, float _Accel_noise_mag, double _dist_thres,
