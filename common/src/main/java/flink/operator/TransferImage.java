@@ -13,6 +13,8 @@ import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.Video;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +31,7 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
     static JLabel vidpanel, vidpanel2, vidpanel3, vidpanel4;
     static BackgroundSubtractorMOG2 mBGSub;
     public static Tracker tracker;
-    static HashSet noticeObj = new HashSet<>();
+    Logger LOG = LoggerFactory.getLogger("time");
 
     public TransferImage() {
         JFrame jFrame = new JFrame("MULTIPLE-TARGET TRACKING");
@@ -97,9 +99,16 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
         if (i > 0) {
             diffFrame = new Mat(frame.size(), CvType.CV_8UC1);
+
+            /*
+             * to use red only commit these two line and uncomment below
+             */
             processFrame(null, frame, diffFrame, mBGSub);
             frame = diffFrame.clone();
-
+//            Scalar rgba_min = new Scalar(0, 151, 100);
+//            Scalar rgba_max = new Scalar(255, 255, 255);
+//            Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2Lab, 0);
+//            Core.inRange(frame, rgba_min, rgba_max, frame);
             array = detectionContours(diffFrame);
 
             Vector<Point> detections = new Vector<>();
@@ -191,16 +200,11 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
         for (int k = 0; k < tracker.tracks.size(); k++) {
             Track track = tracker.tracks.get(k);
-            int traceNum = track.trace.size();
             if (i > CONFIG._skip_frames){
                 Double angle = 90.;
                 Information inf = new Information(track.track_id, eventTime);
                 inf.setLocation(track.prediction);
                 inf.setAngle(angle);
-
-//                Output output = new Output();
-//                output.setInfo(inf);
-//                output.setSpeed((track.trace.get(0).y - track.trace.get(traceNum - 1).y)/(eventTime - track.track_id));
 
                 collector.collect(inf);
             }
