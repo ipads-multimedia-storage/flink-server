@@ -13,6 +13,10 @@ public class Output {
         this.info = info;
     }
 
+    public Information getInfo() {
+        return info;
+    }
+
     public Double getSpeed() {
         return speed;
     }
