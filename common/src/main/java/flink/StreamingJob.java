@@ -20,8 +20,6 @@ package flink;
 
 import flink.operator.InformationToOutput;
 import flink.operator.BandwidthAggregate;
-import flink.operator.LocationAggregate;
-import flink.operator.ObjectIdSelector;
 import flink.sink.BandwidthSerialize;
 import flink.sink.MessageSerialize;
 import flink.sink.PravegaRouter;
