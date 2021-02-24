@@ -4,9 +4,10 @@ import flink.types.Accumulator;
 import flink.types.Information;
 import flink.types.Output;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.streaming.api.functions.aggregation.AggregationFunction;
 
 
-public class LocationAggregate implements AggregateFunction<Information, Accumulator, Output> {
+public class LocationAggregate extends AggregationFunction<Information> implements AggregateFunction<Information, Accumulator, Output> {
     @Override
     // 在一次新的aggregate发起时，创建一个新的Accumulator，Accumulator是我们所说的中间状态数据，简称ACC
     // 这个函数一般在初始化时调用
@@ -31,7 +32,7 @@ public class LocationAggregate implements AggregateFunction<Information, Accumul
     public Output getResult(Accumulator accumulator) {
         Double speed = 0.0;
         if (accumulator.end != null) {
-            speed = (accumulator.end.getPosX() - accumulator.start.getPosX()) / (accumulator.end.getEventTime() - accumulator.start.getEventTime());
+            speed = (accumulator.end.getPosY() - accumulator.start.getPosY()) / (accumulator.end.getEventTime() - accumulator.start.getEventTime());
         }
         Output output = new Output();
         output.setInfo(accumulator.end);
@@ -45,5 +46,10 @@ public class LocationAggregate implements AggregateFunction<Information, Accumul
         a.count += b.count;
         a.end = b.end;
         return a;
+    }
+
+    @Override
+    public Information reduce(Information value1, Information value2) throws Exception {
+        return null;
     }
 }

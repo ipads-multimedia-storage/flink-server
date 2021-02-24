@@ -18,6 +18,7 @@
 
 package flink;
 
+import flink.operator.InformationToOutput;
 import flink.operator.BandwidthAggregate;
 import flink.operator.LocationAggregate;
 import flink.operator.ObjectIdSelector;
@@ -27,6 +28,7 @@ import flink.sink.PravegaRouter;
 import flink.sink.PravegaSerialize;
 import flink.source.OpenCVSocketSource;
 import flink.operator.TransferImage;
+import flink.types.Information;
 import flink.source.TimeAssigner;
 import flink.types.Output;
 import flink.utils.PravegaUtils;
@@ -108,9 +110,8 @@ public class StreamingJob {
         // process the data
         DataStream<Output> output = source
                 .flatMap(new TransferImage())
-                .keyBy(new ObjectIdSelector())
-                .countWindow(5, 2)
-                .aggregate(new LocationAggregate());
+                .keyBy(Information::getObjectID)
+                .flatMap(new InformationToOutput());
 
         // sink data to arm
         output.writeToSocket(params.get("socket.sink.hostname"), params.getInt("socket.sink.port"), new MessageSerialize());
@@ -129,6 +130,7 @@ public class StreamingJob {
                             .withPassword(params.get("jdbc.password"))
                             .build()));
         }
+      
         // execute program
         env.execute("Flink Streaming Java API Skeleton");
     }

@@ -14,8 +14,8 @@ public class DetectTargetObject implements Serializable {
      * Correct the color range- it depends upon the object, camera quality,
      * environment.
      */
-    static Scalar rgba_min = new Scalar(156, 43, 46);
-    static Scalar rgba_max = new Scalar(180, 255, 255);
+    static Scalar rgba_min = new Scalar(0, 151, 100);
+    static Scalar rgba_max = new Scalar(255, 255, 255);
 
     public DetectTargetObject(){
         namedWindow("window");
