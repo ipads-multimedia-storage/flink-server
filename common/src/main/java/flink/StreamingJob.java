@@ -73,7 +73,7 @@ public class StreamingJob {
 
         // set up the streaming execution environment
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
+        env.setParallelism(1);
         // load data from camera
         DataStream<Tuple2<Long, byte[]>> source = env
                 .addSource(new OpenCVSocketSource(params.getInt("socket.source.port")))
