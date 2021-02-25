@@ -11,13 +11,11 @@ import java.util.Vector;
  */
 
 public class Track {
-
-    public Vector<Point> trace;
     public Vector<Point> history;
-    public static int NextTrackID;
     public long track_id;
     public int skipped_frames;
     public int crossBorder;
+    public double angle;
     public Point prediction;
     public Kalman KF;
 
@@ -27,9 +25,9 @@ public class Track {
      * @param Accel_noise_mag = 0.5
      */
     public Track(Point pt, float dt, float Accel_noise_mag, long id) {
-        trace = new Vector<>();
         history = new Vector<>();
         track_id = id;
+        angle = 90.;
         // Every track have its own Kalman filter,
         // it user for next point position prediction.
         // KF = new Kalman(pt);

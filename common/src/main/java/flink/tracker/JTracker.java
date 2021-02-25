@@ -3,6 +3,7 @@ package flink.tracker;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.RotatedRect;
 
 import java.util.Vector;
 
@@ -26,6 +27,6 @@ public abstract class JTracker {
 
     public int track_removed;
 
-    public abstract void update(Vector<Rect> RectArrays, Vector<Point> detections, Mat imag, Long ID);
+    public abstract void update(Vector<RotatedRect> RectArrays, Vector<Point> detections, Mat imag, Long ID);
 
 }

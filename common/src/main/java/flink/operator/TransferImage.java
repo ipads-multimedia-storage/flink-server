@@ -23,7 +23,7 @@ import static flink.utils.ByteTransformer.Mat2bufferedImage;
 
 public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Information> {
     static Mat imag, orgin, kalman, outbox;
-    static Vector<Rect> array;
+    static Vector<RotatedRect> array;
     static JLabel vidpanel;
     public static Tracker tracker;
     Logger LOG = LoggerFactory.getLogger("time");
@@ -59,12 +59,8 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
         Vector<Point> detections = new Vector<>();
         // detections.clear();
-        for (Rect obj : array) {
-            int ObjectCenterX = (int) ((obj.tl().x + obj.br().x) / 2);
-            int ObjectCenterY = (int) ((obj.tl().y + obj.br().y) / 2);
-
-            Point pt = new Point(ObjectCenterX, ObjectCenterY);
-            detections.add(pt);
+        for (RotatedRect obj : array) {
+            detections.add(obj.center);
         }
 
         if (array.size() > 0) {
@@ -72,16 +68,13 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
             // draw object
             if (CONFIG._draw_image_flag) {
-                Iterator<Rect> it3 = array.iterator();
+                Iterator<RotatedRect> it3 = array.iterator();
                 while (it3.hasNext()) {
-                    Rect obj = it3.next();
+                    RotatedRect obj = it3.next();
 
-                    int ObjectCenterX = (int) ((obj.tl().x + obj.br().x) / 2);
-                    int ObjectCenterY = (int) ((obj.tl().y + obj.br().y) / 2);
+                    Point pt = obj.center;
 
-                    Point pt = new Point(ObjectCenterX, ObjectCenterY);
-
-                    Imgproc.rectangle(imag, obj.br(), obj.tl(), new Scalar(0, 255, 0), 2);
+                    Imgproc.rectangle(imag, obj.boundingRect(), new Scalar(0, 255, 0), 2);
                     Imgproc.circle(imag, pt, 1, new Scalar(0, 0, 255), 2);
                 }
             }
@@ -108,10 +101,10 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
         for (int k = 0; k < tracker.tracks.size(); k++) {
             Track track = tracker.tracks.get(k);
-            Double angle = 90.;
+
             Information inf = new Information(track.track_id, eventTime);
             inf.setLocation(track.prediction);
-            inf.setAngle(angle);
+            inf.setAngle(track.angle);
 
             collector.collect(inf);
         }

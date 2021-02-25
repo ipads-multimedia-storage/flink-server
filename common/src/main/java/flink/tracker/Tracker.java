@@ -1,10 +1,7 @@
 package flink.tracker;
 
 import flink.config.CONFIG;
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
@@ -32,7 +29,7 @@ public class Tracker extends JTracker {
         return Math.sqrt(diff.x * diff.x + diff.y * diff.y);
     }
 
-    public void update(Vector<Rect> rectArray, Vector<Point> detections, Mat imag, Long eventTime) {
+    public void update(Vector<RotatedRect> rectArray, Vector<Point> detections, Mat imag, Long eventTime) {
         // detection 一定是检测到的
         if (tracks.size() == 0) {
             // 如果没有track任何，注册所有的
@@ -141,25 +138,15 @@ public class Tracker extends JTracker {
 
         for (int j = 0; j < assignment.size(); j++) {
             if (assignment.get(j) != -1) {
-                Point pt1 = new Point(
-                        (int) ((rectArray.get(assignment.get(j)).tl().x +
-                                rectArray.get(assignment.get(j)).br().x) / 2),
-                        rectArray.get(assignment.get(j)).br().y);
-
-                Point pt2 = new Point(
-                        (int) ((rectArray.get(assignment.get(j)).tl().x +
-                                rectArray.get(assignment.get(j)).br().x) / 2),
-                        rectArray.get(assignment.get(j)).tl().y);
+                Point pt = rectArray.get(assignment.get(j)).center;
                 if (CONFIG._draw_image_flag) {
-                    Imgproc.putText(imag, tracks.get(j).track_id + "", pt2,
+                    Imgproc.putText(imag, tracks.get(j).track_id + "", pt,
                             2, 1, new Scalar(255, 255, 255), 1);
                 }
-                if (tracks.get(j).history.size() < 20)
-                    tracks.get(j).history.add(pt1);
-                else {
+                if (tracks.get(j).history.size() >= 20) {
                     tracks.get(j).history.remove(0);
-                    tracks.get(j).history.add(pt1);
                 }
+                tracks.get(j).history.add(pt);
             }
         }
     }
