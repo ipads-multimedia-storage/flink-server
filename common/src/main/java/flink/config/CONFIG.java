@@ -33,5 +33,6 @@ public class CONFIG {
 
     public static int _skip_frames = 10;
     public static int _output_interval = 500;
+    public static boolean _draw_image_flag = true;
 }
 
