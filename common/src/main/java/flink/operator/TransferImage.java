@@ -29,14 +29,16 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
     Logger LOG = LoggerFactory.getLogger("time");
 
     public TransferImage() {
-        JFrame jFrame = new JFrame("MULTIPLE-TARGET TRACKING");
-        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        vidpanel = new JLabel();
-        jFrame.setContentPane(vidpanel);
-        jFrame.setSize(CONFIG.FRAME_WIDTH, CONFIG.FRAME_HEIGHT);
-        jFrame.setLocation((3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().width,
-                (3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().height);
-        jFrame.setVisible(true);
+        if (CONFIG._draw_image_flag) {
+            JFrame jFrame = new JFrame("MULTIPLE-TARGET TRACKING");
+            jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            vidpanel = new JLabel();
+            jFrame.setContentPane(vidpanel);
+            jFrame.setSize(CONFIG.FRAME_WIDTH, CONFIG.FRAME_HEIGHT);
+            jFrame.setLocation((3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().width,
+                    (3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().height);
+            jFrame.setVisible(true);
+        }
 
         // initial global attributes
         outbox = new Mat();
@@ -86,10 +88,11 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
         } else { // array is empty
             tracker.updateKalman(imag, detections);
         }
-
-        ImageIcon image = new ImageIcon(Mat2bufferedImage(imag));
-        vidpanel.setIcon(image);
-        vidpanel.repaint();
+        if (CONFIG._draw_image_flag) {
+            ImageIcon image = new ImageIcon(Mat2bufferedImage(imag));
+            vidpanel.setIcon(image);
+            vidpanel.repaint();
+        }
     }
 
     @Override

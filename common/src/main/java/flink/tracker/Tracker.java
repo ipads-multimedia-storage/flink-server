@@ -1,5 +1,6 @@
 package flink.tracker;
 
+import flink.config.CONFIG;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -55,7 +56,7 @@ public class Tracker extends JTracker {
         // Cost matrix.
         double[][] Cost = new double[N][M]; // size: N, M
         // Vector<Integer> assignment = new Vector<>(); // assignment according to Hungarian algorithm
-        assignment.clear();
+
         // -----------------------------------
         // Calculate cost matrix (distances)
         // -----------------------------------
@@ -149,9 +150,10 @@ public class Tracker extends JTracker {
                         (int) ((rectArray.get(assignment.get(j)).tl().x +
                                 rectArray.get(assignment.get(j)).br().x) / 2),
                         rectArray.get(assignment.get(j)).tl().y);
-
-                Imgproc.putText(imag, tracks.get(j).track_id + "", pt2,
-                        2, 1, new Scalar(255, 255, 255), 1);
+                if (CONFIG._draw_image_flag) {
+                    Imgproc.putText(imag, tracks.get(j).track_id + "", pt2,
+                            2, 1, new Scalar(255, 255, 255), 1);
+                }
                 if (tracks.get(j).history.size() < 20)
                     tracks.get(j).history.add(pt1);
                 else {
