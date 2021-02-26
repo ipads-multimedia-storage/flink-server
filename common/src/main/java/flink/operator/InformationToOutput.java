@@ -6,26 +6,41 @@ import flink.types.Output;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class InformationToOutput implements FlatMapFunction<Information, Output> {
-    private Information start;
-    private boolean startFlag = false;
-//    private boolean outputFlag = false;
-    static HashSet noticeObj = new HashSet<>();
+    static private final HashMap<Long, Information> starts = new HashMap<>();
+    static private final HashSet<Long> _not_output_set = new HashSet<>();
+    static private boolean _speed_set_flag = false;
+    static private Double speed;
 
     @Override
     public void flatMap(Information value, Collector<Output> out) throws Exception {
-        if (!startFlag) {
-            start = value;
-            startFlag = true;
+        Long objectID = value.getObjectID();
+        if (!starts.containsKey(objectID)) {
+            starts.put(objectID, value);
+            _not_output_set.add(objectID);
         } else {
-            if (value.getEventTime() - start.getEventTime() > CONFIG._output_interval && !noticeObj.contains(value.getObjectID())){
+            Information start = starts.get(objectID);
+            if (value.getEventTime() - start.getEventTime() > CONFIG._output_interval
+                    && _not_output_set.contains(value.getObjectID())){
+
+                double current_speed = (value.getPosX() - start.getPosX()) /
+                        (value.getEventTime() - start.getEventTime());
+
+                if (!_speed_set_flag){
+                    speed = current_speed;
+                    _speed_set_flag = true;
+                } else {
+                    speed = speed * .9 + current_speed * .1;
+                }
+
                 Output output = new Output();
-                output.setSpeed((value.getPosY() - start.getPosY()) / (value.getEventTime() - start.getEventTime()));
+                output.setSpeed(speed);
                 output.setInfo(value);
 
-                noticeObj.add(value.getObjectID());
+                _not_output_set.remove(objectID);
 
                 out.collect(output);
             }

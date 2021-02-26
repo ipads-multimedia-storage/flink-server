@@ -1,21 +1,16 @@
 package flink.tracker;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
+import flink.config.CONFIG;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
 
 /**
  * Tracker.java TODO:
- *
- * @author Kim Dinh Son Email:sonkdbk@gmail.com
  */
 
 public class Tracker extends JTracker {
-//    int nextTractID = 0;
     Vector<Integer> assignment = new Vector<>();
 
     public Tracker(float _dt, float _Accel_noise_mag, double _dist_thres,
@@ -29,25 +24,25 @@ public class Tracker extends JTracker {
         track_removed = 0;
     }
 
-    static Scalar[] Colors = {new Scalar(255, 0, 0), new Scalar(0, 255, 0),
-            new Scalar(0, 0, 255), new Scalar(255, 255, 0),
-            new Scalar(0, 255, 255), new Scalar(255, 0, 255),
-            new Scalar(255, 127, 255), new Scalar(127, 0, 255),
-            new Scalar(127, 0, 127)};
-
     double euclideanDist(Point p, Point q) {
         Point diff = new Point(p.x - q.x, p.y - q.y);
         return Math.sqrt(diff.x * diff.x + diff.y * diff.y);
     }
 
-    public void update(Vector<Rect> rectArray, Vector<Point> detections, Mat imag, Long eventTime) {
+    public void update(Vector<RotatedRect> rectArray, Vector<Point> detections, Mat imag, Long eventTime) {
+        // detection 一定是检测到的
         if (tracks.size() == 0) {
-            // If no tracks yet
-            for (int i = 0; i < detections.size(); i++) {
-                Track tr = new Track(detections.get(i), dt, Accel_noise_mag, eventTime);
+            // 如果没有track任何，注册所有的
+            for (Point detection : detections) {
+                Track tr = new Track(detection, dt, Accel_noise_mag, eventTime);
                 tracks.add(tr);
             }
         }
+
+        // -----------------------------------
+        // 利用距离来匹配 当前的 tracks
+        // 和 这一帧所有的 detections
+        // -----------------------------------
 
         // -----------------------------------
         // Number of tracks and detections
@@ -58,7 +53,7 @@ public class Tracker extends JTracker {
         // Cost matrix.
         double[][] Cost = new double[N][M]; // size: N, M
         // Vector<Integer> assignment = new Vector<>(); // assignment according to Hungarian algorithm
-        assignment.clear();
+
         // -----------------------------------
         // Calculate cost matrix (distances)
         // -----------------------------------
@@ -85,6 +80,8 @@ public class Tracker extends JTracker {
         // Not assigned tracks
         Vector<Integer> not_assigned_tracks = new Vector<>();
 
+        // 对于所有需要 assign 的，计算最小的匹配距离是否大于 threshold
+        // 将新出现的记录到 not_assigned_tracks
         for (int i = 0; i < assignment.size(); i++) {
             if (assignment.get(i) != -1) {
                 if (Cost[i][assignment.get(i)] > dist_thres) {
@@ -141,24 +138,11 @@ public class Tracker extends JTracker {
 
         for (int j = 0; j < assignment.size(); j++) {
             if (assignment.get(j) != -1) {
-                Point pt1 = new Point(
-                        (int) ((rectArray.get(assignment.get(j)).tl().x +
-                                rectArray.get(assignment.get(j)).br().x) / 2),
-                        rectArray.get(assignment.get(j)).br().y);
-
-                Point pt2 = new Point(
-                        (int) ((rectArray.get(assignment.get(j)).tl().x +
-                                rectArray.get(assignment.get(j)).br().x) / 2),
-                        rectArray.get(assignment.get(j)).tl().y);
-
-                Imgproc.putText(imag, tracks.get(j).track_id + "", pt2,
-                        2, 1, new Scalar(255, 255, 255), 1);
-                if (tracks.get(j).history.size() < 20)
-                    tracks.get(j).history.add(pt1);
-                else {
+                Point pt = rectArray.get(assignment.get(j)).center;
+                if (tracks.get(j).history.size() >= 20) {
                     tracks.get(j).history.remove(0);
-                    tracks.get(j).history.add(pt1);
                 }
+                tracks.get(j).history.add(pt);
             }
         }
     }
@@ -185,16 +169,7 @@ public class Tracker extends JTracker {
                         0), false);
             }
 
-            if (tracks.get(i).trace.size() > max_trace_length) {
-                for (int j = 0; j < tracks.get(i).trace.size()
-                        - max_trace_length; j++)
-                    tracks.get(i).trace.remove(j);
-            }
-
-            tracks.get(i).trace.add(tracks.get(i).prediction);
             tracks.get(i).KF.setLastResult(tracks.get(i).prediction);
-            // Imgproc.putText(imag, "K",tracks.get(i).prediction,
-            // Core.FONT_HERSHEY_PLAIN, 2, new Scalar(255, 255, 255), 1);
         }
     }
 }
