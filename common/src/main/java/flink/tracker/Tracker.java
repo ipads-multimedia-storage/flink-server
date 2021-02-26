@@ -139,10 +139,6 @@ public class Tracker extends JTracker {
         for (int j = 0; j < assignment.size(); j++) {
             if (assignment.get(j) != -1) {
                 Point pt = rectArray.get(assignment.get(j)).center;
-                if (CONFIG._draw_image_flag) {
-                    Imgproc.putText(imag, tracks.get(j).track_id + "", pt,
-                            2, 1, new Scalar(255, 255, 255), 1);
-                }
                 if (tracks.get(j).history.size() >= 20) {
                     tracks.get(j).history.remove(0);
                 }

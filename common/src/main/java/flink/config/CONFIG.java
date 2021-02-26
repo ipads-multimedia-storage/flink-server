@@ -28,11 +28,11 @@ public class CONFIG {
     public static double _dt = 0.2;
     public static double _Accel_noise_mag = 0.5;
     public static double _dist_thres = 200;
-    public static int _maximum_allowed_skipped_frames = 50;
+    public static int _maximum_allowed_skipped_frames = 20;
     public static int _max_trace_length = 5;
 
     public static int _skip_frames = 10;
     public static int _output_interval = 500;
-    public static boolean _draw_image_flag = false;
+    public static boolean _draw_image_flag = true;
 }
 

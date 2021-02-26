@@ -28,6 +28,18 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
     public static Tracker tracker;
     Logger LOG = LoggerFactory.getLogger("time");
 
+    public static Vector<RotatedRect> getCurrentArray(){
+        return array;
+    }
+
+    public static Tracker getCurrentTracker(){
+        return tracker;
+    }
+
+    public static Mat getCurrentImage(){
+        return imag;
+    }
+
     public TransferImage() {
         if (CONFIG._draw_image_flag) {
             JFrame jFrame = new JFrame("MULTIPLE-TARGET TRACKING");
@@ -35,8 +47,7 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
             vidpanel = new JLabel();
             jFrame.setContentPane(vidpanel);
             jFrame.setSize(CONFIG.FRAME_WIDTH, CONFIG.FRAME_HEIGHT);
-            jFrame.setLocation((3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().width,
-                    (3 / 4) * Toolkit.getDefaultToolkit().getScreenSize().height);
+            jFrame.setLocation(200, 200);
             jFrame.setVisible(true);
         }
 
@@ -65,23 +76,28 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
 
         if (array.size() > 0) {
             tracker.update(array, detections, imag, eventTime);
-
-            // draw object
-            if (CONFIG._draw_image_flag) {
-                Iterator<RotatedRect> it3 = array.iterator();
-                while (it3.hasNext()) {
-                    RotatedRect obj = it3.next();
-
-                    Point pt = obj.center;
-
-                    Imgproc.rectangle(imag, obj.boundingRect(), new Scalar(0, 255, 0), 2);
-                    Imgproc.circle(imag, pt, 1, new Scalar(0, 0, 255), 2);
-                }
-            }
         } else { // array is empty
             tracker.updateKalman(imag, detections);
         }
+
+        // draw object
         if (CONFIG._draw_image_flag) {
+            for (RotatedRect obj : array) {
+                Imgproc.rectangle(imag, obj.boundingRect(),
+                        new Scalar(0, 255, 0), 2);
+                Imgproc.circle(imag, obj.center, 1,
+                        new Scalar(0, 0, 255), 2);
+            }
+
+            for (int k = 0; k < tracker.tracks.size(); k++) {
+                Track track = tracker.tracks.get(k);
+//                String location = "(" + track.prediction.x + ", "
+//                        + track.prediction.y + ")";
+                Imgproc.putText(imag, "" + track.track_id,
+                        track.prediction, 2, 1,
+                        new Scalar(255, 255, 255), 1);
+            }
+
             ImageIcon image = new ImageIcon(Mat2bufferedImage(imag));
             vidpanel.setIcon(image);
             vidpanel.repaint();
