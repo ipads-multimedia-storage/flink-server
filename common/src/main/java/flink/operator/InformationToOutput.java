@@ -33,7 +33,11 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
                     speed = current_speed;
                     _speed_set_flag = true;
                 } else {
-                    speed = speed * .9 + current_speed * .1;
+                    if (Math.abs(current_speed - speed) > CONFIG._speed_change_thres){
+                        speed = current_speed;
+                    } else {
+                        speed = speed * .9 + current_speed * .1;
+                    }
                 }
 
                 Output output = new Output();
