@@ -128,7 +128,7 @@ public class StreamingJob {
                             .withPassword(params.get("jdbc.password"))
                             .build()));
         }
-      
+
         // execute program
         env.execute("Flink Streaming Java API Skeleton");
     }

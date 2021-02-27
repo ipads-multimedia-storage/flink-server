@@ -165,6 +165,7 @@ public class Tracker extends JTracker {
                         detections.get(assignment.get(i)), true);
             } else // if not continue using predictions
             {
+                tracks.get(i).skipped_frames ++;
                 tracks.get(i).prediction = tracks.get(i).KF.update(new Point(0,
                         0), false);
             }
