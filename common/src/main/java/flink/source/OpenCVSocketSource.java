@@ -1,7 +1,5 @@
 package flink.source;
 
-import flink.utils.BandwidthDetection;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.IOUtils;
 import org.apache.flink.util.Preconditions;
@@ -13,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> {
+public class OpenCVSocketSource implements SourceFunction<SourceData> {
     private volatile boolean isRunning;
     private transient Socket currentSocket;
     private transient ServerSocket serverSocket;
@@ -26,7 +24,7 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
     }
 
     @Override
-    public void run(SourceContext<Tuple2<Long, byte[]>> sourceContext) throws Exception {
+    public void run(SourceContext<SourceData> sourceContext) throws Exception {
         this.serverSocket = new ServerSocket(this.port);
         while(this.isRunning) {
             Socket socket = null;
@@ -74,10 +72,7 @@ public class OpenCVSocketSource implements SourceFunction<Tuple2<Long, byte[]>> 
                         }
                         if(eof) break;
                         long afterTime = System.currentTimeMillis();
-                        long gap = afterTime - beforeTime;
-//                        System.out.println("gap is: " + gap);
-                        BandwidthDetection.record(gap, length);
-                        sourceContext.collect(new Tuple2<>(eventTime, byteBuf));
+                        sourceContext.collect(new SourceData(eventTime, afterTime, beforeTime, byteBuf));
                     }
                 } catch (Throwable throwable2) {
                     throwable1 = throwable2;
