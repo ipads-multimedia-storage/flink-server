@@ -1,12 +1,12 @@
 package flink.operator;
 
 import flink.config.CONFIG;
+import flink.source.SourceData;
 import flink.tracker.Track;
 import flink.tracker.Tracker;
 import flink.types.Information;
 import flink.utils.ByteTransformer;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.opencv.core.Point;
 import org.opencv.core.*;
@@ -15,13 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.*;
 
 import static flink.tracker.DetectContours.detectionContours;
 import static flink.utils.ByteTransformer.Mat2bufferedImage;
 
-public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Information> {
+public class TransferImage implements FlatMapFunction<SourceData, Information> {
     static Mat imag, orgin, kalman, outbox;
     static Vector<RotatedRect> array;
     static JLabel vidpanel;
@@ -105,9 +104,9 @@ public class TransferImage implements FlatMapFunction<Tuple2<Long, byte[]>, Info
     }
 
     @Override
-    public void flatMap(Tuple2<Long, byte[]> in, Collector<Information> collector) throws Exception {
-        byte[] bytes = in.f1;
-        Long eventTime = in.f0;
+    public void flatMap(SourceData in, Collector<Information> collector) throws Exception {
+        byte[] bytes = in.getData();
+        Long eventTime = in.getEventTime();
 
         long start = System.currentTimeMillis();
 

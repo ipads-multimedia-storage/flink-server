@@ -19,13 +19,14 @@
 package flink;
 
 import flink.operator.InformationToOutput;
-import flink.operator.BandwidthAggregate;
 import flink.sink.BandwidthSerialize;
 import flink.sink.MessageSerialize;
 import flink.sink.PravegaRouter;
 import flink.sink.PravegaSerialize;
+import flink.source.BandwidthReduce;
 import flink.source.OpenCVSocketSource;
 import flink.operator.TransferImage;
+import flink.source.SourceData;
 import flink.types.Information;
 import flink.source.TimeAssigner;
 import flink.types.Output;
@@ -34,7 +35,6 @@ import io.pravega.client.stream.Stream;
 import io.pravega.connectors.flink.FlinkPravegaWriter;
 import io.pravega.connectors.flink.PravegaConfig;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
 import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
@@ -73,10 +73,10 @@ public class StreamingJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         // load data from camera
-        DataStream<Tuple2<Long, byte[]>> source = env
+        DataStream<SourceData> source = env
                 .addSource(new OpenCVSocketSource(params.getInt("socket.source.port")))
                 .assignTimestampsAndWatermarks(WatermarkStrategy
-                        .<Tuple2<Long, byte[]>>forBoundedOutOfOrderness(Duration.ofSeconds(3))
+                        .<SourceData>forBoundedOutOfOrderness(Duration.ofSeconds(3))
                         .withTimestampAssigner(new TimeAssigner()));
 
         // build Pravega writer
@@ -86,8 +86,8 @@ public class StreamingJob {
                     .withControllerURI(URI.create(params.get("pravega.uri")))
                     .withDefaultScope(params.get("pravega.scope", "testScope"));
             Stream stream = PravegaUtils.createStream(pravegaConfig, params.get("pravega.stream", "testStream"));
-            FlinkPravegaWriter<Tuple2<Long, byte[]>> pravegaWriter = FlinkPravegaWriter
-                    .<Tuple2<Long, byte[]>>builder()
+            FlinkPravegaWriter<SourceData> pravegaWriter = FlinkPravegaWriter
+                    .<SourceData>builder()
                     .forStream(stream)
                     .withPravegaConfig(pravegaConfig)
                     .withSerializationSchema(new PravegaSerialize())
@@ -102,7 +102,7 @@ public class StreamingJob {
         // source.flatMap(new ShowImage());
 
         source.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(10)))
-                .aggregate(new BandwidthAggregate())
+                .reduce(new BandwidthReduce())
                 .writeToSocket(params.get("socket.sink.hostname"), params.getInt("socket.bandwidth.port"), new BandwidthSerialize());
 
         // process the data

@@ -1,17 +1,17 @@
 package flink.operator;
 
+import flink.source.SourceData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 
-public class BandwidthAggregate implements AggregateFunction<Tuple2<Long, byte[]>, Long, Long> {
+public class BandwidthAggregate implements AggregateFunction<SourceData, Long, Long> {
     @Override
     public Long createAccumulator() {
         return 0L;
     }
 
     @Override
-    public Long add(Tuple2<Long, byte[]> value, Long accumulator) {
-        accumulator += 1;
+    public Long add(SourceData value, Long accumulator) {
         return accumulator;
     }
 
