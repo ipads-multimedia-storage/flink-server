@@ -18,6 +18,7 @@
 
 package flink;
 
+import flink.operator.DetectObjects;
 import flink.operator.InformationToOutput;
 import flink.sink.BandwidthSerialize;
 import flink.sink.MessageSerialize;
@@ -26,7 +27,7 @@ import flink.sink.PravegaSerialize;
 import flink.source.BandwidthReduce;
 import flink.source.OpenCVSocketSource;
 import flink.operator.TransferImage;
-import flink.source.SourceData;
+import flink.types.SourceData;
 import flink.types.Information;
 import flink.source.TimeAssigner;
 import flink.types.Output;
@@ -107,6 +108,7 @@ public class StreamingJob {
 
         // process the data
         DataStream<Output> output = source
+                .flatMap(new DetectObjects())
                 .flatMap(new TransferImage())
                 .keyBy(Information::getObjectID)
                 .flatMap(new InformationToOutput());

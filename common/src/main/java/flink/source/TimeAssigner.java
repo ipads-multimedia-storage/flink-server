@@ -1,7 +1,7 @@
 package flink.source;
 
+import flink.types.SourceData;
 import org.apache.flink.api.common.eventtime.*;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 public class TimeAssigner implements SerializableTimestampAssigner<SourceData>{
 

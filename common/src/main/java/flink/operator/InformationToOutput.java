@@ -13,7 +13,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
     static private final HashMap<Long, Information> starts = new HashMap<>();
     static private final HashSet<Long> _not_output_set = new HashSet<>();
     static private boolean _speed_set_flag = false;
-    static private Double speed;
+    static private double speed;
 
     @Override
     public void flatMap(Information value, Collector<Output> out) throws Exception {
@@ -23,7 +23,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
             _not_output_set.add(objectID);
         } else {
             Information start = starts.get(objectID);
-            if (value.getEventTime() - start.getEventTime() > CONFIG._output_interval
+            if (value.getEventTime() - objectID > CONFIG._output_interval
                     && _not_output_set.contains(value.getObjectID())){
 
                 double current_speed = (value.getPosX() - start.getPosX()) /
@@ -33,11 +33,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
                     speed = current_speed;
                     _speed_set_flag = true;
                 } else {
-                    if (Math.abs(current_speed - speed) > CONFIG._speed_change_thres){
-                        speed = current_speed;
-                    } else {
-                        speed = speed * .9 + current_speed * .1;
-                    }
+                    speed = .9 * speed + .1 * current_speed;
                 }
 
                 Output output = new Output();
@@ -45,6 +41,9 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
                 output.setInfo(value);
 
                 _not_output_set.remove(objectID);
+                if (value.getSkippedFrames() >= CONFIG._maximum_allowed_skipped_frames - 1){
+                    starts.remove(objectID);
+                }
 
                 out.collect(output);
             }

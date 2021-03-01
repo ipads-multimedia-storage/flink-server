@@ -91,7 +91,8 @@ public class MainTrack implements Serializable {
         }
     }
 
-    public Tracker detect(Mat frame, Long eventTime) throws Exception {
+    public Tracker detect(Mat frame, Long eventTime, Vector<RotatedRect> array) throws Exception {
+        /*
         // ----------------------------------------
         // process the image
         // ----------------------------------------
@@ -103,7 +104,9 @@ public class MainTrack implements Serializable {
         // detect all the existed objects in thia frame
         // ----------------------------------------
         array = detectionContours(frame);
+         */
 
+        imag = frame.clone();
 
         // ----------------------------------------
         // use these information to update tracker

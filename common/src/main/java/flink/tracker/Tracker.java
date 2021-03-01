@@ -1,8 +1,6 @@
 package flink.tracker;
 
-import flink.config.CONFIG;
 import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.Vector;
 
