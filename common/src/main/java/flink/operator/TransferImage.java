@@ -24,7 +24,7 @@ public class TransferImage implements FlatMapFunction<SourceData, Information> {
         tracker = main.detect(ByteTransformer.Byte2Mat(in.getData()), in.getEventTime());
 
         // LOG the latency information
-        LOG.info("Network takes:{} ms\tProcess takes: {} ms", start - in.getEventTime(), System.currentTimeMillis() - start);
+        LOG.info("Network takes: {}ms\t Buffer takes: {}ms\t Process takes: {}ms", start - in.getEventTime(), start - in.getStartTime(), System.currentTimeMillis() - start);
 
         for (int k = 0; k < tracker.tracks.size(); k++) {
             Track track = tracker.tracks.get(k);
@@ -33,6 +33,7 @@ public class TransferImage implements FlatMapFunction<SourceData, Information> {
             Information inf = new Information(track.track_id, in.getEventTime());
             inf.setLocation(track.prediction);
             inf.setAngle(track.angle);
+            inf.setSkippedFrames(track.skipped_frames);
 
             collector.collect(inf);
         }

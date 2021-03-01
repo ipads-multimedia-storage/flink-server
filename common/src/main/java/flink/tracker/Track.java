@@ -1,13 +1,10 @@
 package flink.tracker;
 
 import org.opencv.core.Point;
-
 import java.util.Vector;
 
 /**
- * Track.java TODO:
- *
- * @author Kim Dinh Son Email:sonkdbk@gmail.com
+ * Track.java
  */
 
 public class Track {

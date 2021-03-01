@@ -32,7 +32,7 @@ public class CONFIG {
     public static int _max_trace_length = 5;
 
     public static int _skip_frames = 10;
-    public static int _output_interval = 500;
+    public static int _output_interval = 600;
     public static boolean _draw_image_flag = true;
     public static double _speed_change_thres = .1;
 }
