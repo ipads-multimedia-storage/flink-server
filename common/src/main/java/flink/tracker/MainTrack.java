@@ -56,8 +56,10 @@ public class MainTrack implements Serializable {
 
                 for (int k = 0; k < tracker.tracks.size(); k++) {
                     Track track = tracker.tracks.get(k);
-                    Imgproc.putText(imag, track.track_id + "", track.prediction,
-                            2, 1, new Scalar(255, 255, 255), 1);
+                    if (track.skipped_frames < CONFIG._maximum_allowed_skipped_frames) {
+                        Imgproc.putText(imag, track.track_id + "", track.prediction,
+                                2, 1, new Scalar(255, 255, 255), 1);
+                    }
                 }
 
                 // repaint the image
@@ -89,7 +91,8 @@ public class MainTrack implements Serializable {
         }
     }
 
-    public Tracker detect(Mat frame, Long eventTime) throws Exception {
+    public Tracker detect(Mat frame, Long eventTime, Vector<RotatedRect> array) throws Exception {
+        /*
         // ----------------------------------------
         // process the image
         // ----------------------------------------
@@ -101,7 +104,9 @@ public class MainTrack implements Serializable {
         // detect all the existed objects in thia frame
         // ----------------------------------------
         array = detectionContours(frame);
+         */
 
+        imag = frame.clone();
 
         // ----------------------------------------
         // use these information to update tracker

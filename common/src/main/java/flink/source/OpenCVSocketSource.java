@@ -1,5 +1,6 @@
 package flink.source;
 
+import flink.types.SourceData;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.util.IOUtils;
 import org.apache.flink.util.Preconditions;

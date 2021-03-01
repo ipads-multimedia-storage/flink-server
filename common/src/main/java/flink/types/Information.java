@@ -6,6 +6,9 @@ import org.opencv.core.Point;
 public class Information {
     Long objectID;
     Long eventTime;
+    Integer skippedFrames;
+    Double angle;
+    Tuple2<Double, Double> location;
 
     public Double getAngle() {
         return angle;
@@ -14,9 +17,6 @@ public class Information {
     public void setAngle(Double angle) {
         this.angle = angle;
     }
-
-    Double angle;
-    Tuple2<Double, Double> location;
 
     public Information(Long objectID, Long eventTime, Double posX, Double posY, Double angle) {
         this.objectID = objectID;
@@ -30,9 +30,7 @@ public class Information {
         this.eventTime = eventTime;
     }
 
-    public Information() {
-
-    }
+    public Information() {}
 
     public void setObjectID(Long objectID) {
         this.objectID = objectID;
@@ -58,10 +56,6 @@ public class Information {
         this.location = Tuple2.of(center.x, center.y);
     }
 
-    public void showMessage() {
-//        System.out.println("id:" + objectID + ",  time:" + eventTime + ", angle:" + angle + ", location: (" + location.f0 + ", " + location.f1 + ")");
-    }
-
     public Double getPosX() {
         return location.f0;
     }
@@ -72,5 +66,13 @@ public class Information {
 
     public Long getObjectID() {
         return objectID;
+    }
+
+    public Integer getSkippedFrames() {
+        return skippedFrames;
+    }
+
+    public void setSkippedFrames(Integer skippedFrames) {
+        this.skippedFrames = skippedFrames;
     }
 }

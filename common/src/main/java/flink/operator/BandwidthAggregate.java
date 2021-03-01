@@ -1,8 +1,7 @@
 package flink.operator;
 
-import flink.source.SourceData;
+import flink.types.SourceData;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 public class BandwidthAggregate implements AggregateFunction<SourceData, Long, Long> {
     @Override

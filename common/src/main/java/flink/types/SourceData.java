@@ -1,4 +1,4 @@
-package flink.source;
+package flink.types;
 
 public class SourceData {
     private Long eventTime;

@@ -1,5 +1,6 @@
 package flink.source;
 
+import flink.types.SourceData;
 import org.apache.flink.api.common.functions.ReduceFunction;
 
 public class BandwidthReduce implements ReduceFunction<SourceData> {
