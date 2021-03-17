@@ -53,6 +53,7 @@ public class TransferImage implements FlatMapFunction<SourceData, Information> {
             inf.setLocation(track.prediction);
             inf.setAngle(track.angle);
             inf.setSpawnTime(System.currentTimeMillis());
+            inf.setSkippedFrames(track.skipped_frames);
 
             collector.collect(inf);
         }
