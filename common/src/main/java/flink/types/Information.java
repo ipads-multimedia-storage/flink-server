@@ -6,6 +6,7 @@ import org.opencv.core.Point;
 public class Information {
     Long objectID;
     Long eventTime;
+    Long spawnTime; // for measuring latency
 
     public Double getAngle() {
         return angle;
@@ -72,5 +73,13 @@ public class Information {
 
     public Long getObjectID() {
         return objectID;
+    }
+
+    public Long getSpawnTime() {
+        return spawnTime;
+    }
+
+    public void setSpawnTime(Long spawnTime) {
+        this.spawnTime = spawnTime;
     }
 }

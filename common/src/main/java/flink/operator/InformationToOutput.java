@@ -16,7 +16,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
     static private Double speed;
 
     @Override
-    public void flatMap(Information value, Collector<Output> out) throws Exception {
+    public void flatMap(Information value, Collector<Output> out) {
         Long objectID = value.getObjectID();
         if (!starts.containsKey(objectID)) {
             starts.put(objectID, value);
@@ -39,6 +39,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
                 Output output = new Output();
                 output.setSpeed(speed);
                 output.setInfo(value);
+                output.setSpawnTime(start.getSpawnTime());
 
                 _not_output_set.remove(objectID);
 
