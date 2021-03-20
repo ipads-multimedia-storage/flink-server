@@ -27,16 +27,19 @@ The struct of this project is
 	  ├── java/flink
 	  │ ├── config
 	  │	  ├── CONFIG.java -- parameter used during process
-	  │	├── opencv // old files
 	  │	├── operator -- apache flink operators
 	  │	  ├── InformationToOutput.java -- trans detect info to message to client
       │   ├── TransferImage.java -- translate image to detect info
 	  │	├── sink
 	  │	  ├── BandwidthSerialize.java -- give bandwidth info to client
 	  │	  ├── MessageSerialize.java -- give objects info to client
-	  │	  ├── PravegaRouter.java -- 
-	  │	  ├── PravegaSerialize.java -- 
+	  │	  ├── PravegaRouter.java -- allocate stream router key for Pravega
+	  │	  ├── PravegaSerialize.java -- serialize stream for Pravega
    	  │	├── source
+	  │	  ├── BandwidthReduce.java -- for bandwidth detection
+	  │	  ├── OpenCVSocketSource.java -- receive video stream from client
+	  │	  ├── SourceData.java -- source data type TODO?: move it to "types" package
+	  │	  ├── TimeAssigner.java -- assign timestamp to stream
 	  │	├── tracker // detect and tracking related
 	  │	├── types // defined types
 	  │	├── utils // some useless 
