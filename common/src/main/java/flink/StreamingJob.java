@@ -61,7 +61,7 @@ import java.time.Duration;
  */
 public class StreamingJob {
     // load opencv dll file
-    static { System.load("C:\\Windows\\System32\\opencv.dll"); }
+    static { System.loadLibrary("libopencv_java4"); }
 
     public static void main(String[] args) throws Exception {
         // build parameters

@@ -6,6 +6,7 @@ import org.opencv.core.Point;
 public class Information {
     Long objectID;
     Long eventTime;
+    Long spawnTime; // for measuring latency
     Integer skippedFrames;
     Double angle;
     Tuple2<Double, Double> location;
@@ -66,6 +67,14 @@ public class Information {
 
     public Long getObjectID() {
         return objectID;
+    }
+
+    public Long getSpawnTime() {
+        return spawnTime;
+    }
+
+    public void setSpawnTime(Long spawnTime) {
+        this.spawnTime = spawnTime;
     }
 
     public Integer getSkippedFrames() {

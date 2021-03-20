@@ -17,7 +17,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
     static private double speed;
 
     @Override
-    public void flatMap(Information value, Collector<Output> out) throws Exception {
+    public void flatMap(Information value, Collector<Output> out) {
         //当前的object id
         Long objectID = value.getObjectID();
         // 如果是第一个到达的，记录它的信息到starts集合
@@ -39,6 +39,7 @@ public class InformationToOutput implements FlatMapFunction<Information, Output>
                 Output output = new Output();
                 output.setSpeed(speed);
                 output.setInfo(value);
+                output.setSpawnTime(start.getSpawnTime());
 
                 _not_output_set.remove(objectID);
                 if (value.getSkippedFrames() >= CONFIG._maximum_allowed_skipped_frames - 1){

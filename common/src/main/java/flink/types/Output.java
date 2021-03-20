@@ -5,6 +5,7 @@ import org.json.JSONObject;
 public class Output {
     public Information info;
     Double speed;
+    private Long spawnTime; // for measuring latency
 
     public Output() {
     }
@@ -37,5 +38,13 @@ public class Output {
         jsonObject.put("y", info.getPosY());
         jsonObject.put("angle", info.getAngle());
         return jsonObject;
+    }
+
+    public Long getSpawnTime() {
+        return spawnTime;
+    }
+
+    public void setSpawnTime(Long spawnTime) {
+        this.spawnTime = spawnTime;
     }
 }
