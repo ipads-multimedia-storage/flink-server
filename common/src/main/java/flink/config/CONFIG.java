@@ -1,7 +1,5 @@
 package flink.config;
 
-import org.opencv.core.Scalar;
-
 import java.awt.*;
 
 /**
@@ -17,12 +15,6 @@ public class CONFIG {
     public static double MIN_BLOB_AREA = 5000;
     public static double MAX_BLOB_AREA = 100000;
 
-    public static Scalar[] Colors = {new Scalar(255, 0, 0), new Scalar(0, 255, 0),
-            new Scalar(0, 0, 255), new Scalar(255, 255, 0),
-            new Scalar(0, 255, 255), new Scalar(255, 0, 255),
-            new Scalar(255, 127, 255), new Scalar(127, 0, 255),
-            new Scalar(127, 0, 127)};
-
     public static double learningRate = 0.005;
 
     public static double _dt = 0.2;
@@ -32,7 +24,7 @@ public class CONFIG {
     public static int _max_trace_length = 5;
 
     public static int _skip_frames = 10;
-    public static int _output_interval = 500;
+    public static int _output_interval = 200;
     public static boolean _draw_image_flag = true;
     public static double _speed_change_thres = .1;
 }

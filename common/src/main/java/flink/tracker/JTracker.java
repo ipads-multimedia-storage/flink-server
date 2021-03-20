@@ -2,7 +2,6 @@ package flink.tracker;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
-import org.opencv.core.Rect;
 import org.opencv.core.RotatedRect;
 
 import java.util.Vector;
